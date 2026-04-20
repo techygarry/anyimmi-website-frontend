@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ProductSwitcher } from '@/lib/platform-client';
 import { getCategories } from '@/lib/api';
 import CategoryIcon from './CategoryIcon';
 import CheckoutLink from './CheckoutLink';
@@ -65,12 +66,15 @@ export default async function Header({
                       </div>
                     </div>
                   </li>
+                  <li><Link href="/pricing">Pricing</Link></li>
                   <li><Link href="/about">About Us</Link></li>
                   <li><Link href="/contact">Contact</Link></li>
                 </ul>
               </nav>
             </div>
-            <div className="header-right">
+            <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              {/* Renders only for logged-in users with 2+ entitlements (auto-hides on marketing). */}
+              <ProductSwitcher currentProduct="bundle" />
               <CheckoutLink className="rr-btn-border">
                 <span className="text">GET STARTED</span>
                 <span className="icon"><i className="fa-regular fa-arrow-right"></i></span>

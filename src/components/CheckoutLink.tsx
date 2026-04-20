@@ -24,7 +24,11 @@ export default function CheckoutLink({
     if (loading) return;
     setLoading(true);
     try {
-      const url = await bundleCheckout(tier);
+      // Pass the tier as a success-url hint so the /thank-you page can show
+      // the 24h upgrade modal to TOOLKIT and FIRM buyers.
+      const justBought =
+        tier === 'toolkit' || tier === 'firm' ? (tier as 'toolkit' | 'firm') : undefined;
+      const url = await bundleCheckout(tier, justBought);
       window.location.href = url;
     } catch {
       alert('Checkout failed. Please try again.');

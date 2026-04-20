@@ -66,7 +66,7 @@ export default function TestimonialSlider() {
         <div className="row d-flex justify-content-center">
           <div className="col-xl-8 text-center">
             <h2 className="section-title rr-title-anim-2" style={{ color: "#fff" }}>
-              What Immigration Consultants Are Saying About AnyImmi
+              RCICs inside the bundle (first 14 days after soft launch).
             </h2>
           </div>
         </div>
@@ -139,6 +139,21 @@ export default function TestimonialSlider() {
               <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
             </svg>
             Trusted by 500+ Immigration Consultants Across Canada
+          </p>
+          <p
+            className="wow fadeInUp"
+            data-wow-delay="0.4s"
+            style={{
+              marginTop: "10px",
+              fontSize: "13px",
+              color: "rgba(255,255,255,0.55)",
+              maxWidth: "640px",
+              marginLeft: "auto",
+              marginRight: "auto",
+              lineHeight: 1.5,
+            }}
+          >
+            Names shown are early Founder-tier buyers who agreed to be quoted. Full case studies publishing July 1.
           </p>
         </div>
       </div>

@@ -40,6 +40,8 @@ export interface CategoryData {
   useCases: string[];
   assetCount: number;
   sortOrder: number;
+  isLocked?: boolean;
+  unlockTier?: string;
 }
 
 export async function getCategories(): Promise<CategoryData[]> {
@@ -62,10 +64,37 @@ export interface BundlePlanData {
   delivery: string;
   highlight: boolean;
   active: boolean;
+  valueAnchor?: string;
+  tagline?: string;
+  topTierEntitlements?: string[];
 }
 
 export async function getBundlePlans(): Promise<BundlePlanData[]> {
   return (await cachedFetch<BundlePlanData[]>(`${API_URL}/api/payments/bundle-plans`, 60)) ?? [];
+}
+
+// ─── Founder Counter ───────────────────────────────────────
+
+export interface FounderCounterData {
+  current: number;
+  target: number;
+  remaining: number;
+}
+
+export async function getFounderCounter(): Promise<FounderCounterData | null> {
+  return cachedFetch<FounderCounterData>(`${API_URL}/api/content/founder-counter`, 60);
+}
+
+// ─── Bonus Countdown ───────────────────────────────────────
+
+export interface BonusCountdownData {
+  expiresAt: string;
+  bonusDescription: string;
+  secondsRemaining: number;
+}
+
+export async function getBonusCountdown(): Promise<BonusCountdownData | null> {
+  return cachedFetch<BonusCountdownData>(`${API_URL}/api/content/bonus-countdown`, 60);
 }
 
 // ─── Slider Images ──────────────────────────────────────────
@@ -154,11 +183,21 @@ export async function getCategoryItem(id: string): Promise<CategoryItemDetail | 
 
 // ─── Checkout ──────────────────────────────────────────────
 
-export async function bundleCheckout(tier: string): Promise<string> {
+/**
+ * Start a Stripe checkout session for a bundle tier.
+ *
+ * `justBought` is passed through to the backend so it can append
+ * `?just-bought=<tier>` to the Stripe success_url. That query param then
+ * drives the 24-hour post-checkout upgrade modal on /thank-you.
+ */
+export async function bundleCheckout(
+  tier: string,
+  justBought?: "toolkit" | "firm",
+): Promise<string> {
   const res = await fetch(`${API_URL}/api/payments/bundle-checkout`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ tier }),
+    body: JSON.stringify({ tier, justBought }),
   });
 
   if (!res.ok) {

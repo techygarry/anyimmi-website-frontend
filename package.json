@@ -1,12 +1,14 @@
 {
-  "name": "trexa-next",
-  "version": "0.1.0",
-  "private": true,
+  "name": "anyimmi-bundle-marketing",
+  "version": "0.2.0",
+  "private": false,
+  "description": "Marketing site for AnyImmi Bundle — the goldmine of Canadian immigration assets for RCICs. Standalone mirror of the monorepo's apps/marketing-bundle, intended for design tools (Google Stitch) and independent deploys.",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3030",
     "build": "next build",
     "start": "next start -p 3030",
-    "lint": "eslint"
+    "lint": "eslint",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "lucide-react": "^0.575.0",
@@ -15,12 +17,15 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "postcss": "^8",
+    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }

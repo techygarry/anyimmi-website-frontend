@@ -1,47 +1,72 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { SOCIAL_PROOF_ROTATIONS, type SocialProofEntry } from '@/data/socialProof';
 
-const PROOF_DATA = [
-  { name: 'Amandeep S.', city: 'Toronto', bundle: 'Agency' },
-  { name: 'Maria L.', city: 'Vancouver', bundle: 'Professional' },
-  { name: 'James W.', city: 'Calgary', bundle: 'Starter' },
-  { name: 'Priya K.', city: 'Edmonton', bundle: 'Professional' },
-  { name: 'Michael T.', city: 'Ottawa', bundle: 'Agency' },
-  { name: 'Sarah C.', city: 'Montreal', bundle: 'Starter' },
-  { name: 'Raj P.', city: 'Winnipeg', bundle: 'Professional' },
-  { name: 'Emily R.', city: 'Halifax', bundle: 'Agency' },
-];
+const SCROLL_THRESHOLD_PX = 800;
+const VISIBLE_MS = 4000;           // fade in + stay ~4s
+const GAP_MIN_MS = 60_000;         // 60s min gap between toasts
+const GAP_MAX_MS = 90_000;         // 90s max gap
 
 function randomBetween(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export default function SocialProofToast() {
-  const [toast, setToast] = useState<{ name: string; city: string; bundle: string } | null>(null);
-  const [visible, setVisible] = useState(false);
+const TIER_LABEL: Record<SocialProofEntry['tier'], string> = {
+  TOOLKIT: 'THE TOOLKIT',
+  FIRM: 'THE FIRM',
+  FOUNDER: 'THE FOUNDER',
+};
 
+export default function SocialProofToast() {
+  const [toast, setToast] = useState<SocialProofEntry | null>(null);
+  const [visible, setVisible] = useState(false);
+  const [armed, setArmed] = useState(false);
+
+  // Arm the toast only once the user has scrolled past the threshold.
   useEffect(() => {
+    if (armed) return;
+    if (typeof window === 'undefined') return;
+
+    function onScroll() {
+      if (window.scrollY >= SCROLL_THRESHOLD_PX) {
+        setArmed(true);
+      }
+    }
+
+    onScroll(); // handle direct-deep-link case
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [armed]);
+
+  // Rotation loop — only runs once armed.
+  useEffect(() => {
+    if (!armed) return;
+    if (SOCIAL_PROOF_ROTATIONS.length === 0) return;
+
     let showTimeout: ReturnType<typeof setTimeout>;
     let hideTimeout: ReturnType<typeof setTimeout>;
+    let index = randomBetween(0, SOCIAL_PROOF_ROTATIONS.length - 1);
 
     function showNext() {
-      const item = PROOF_DATA[randomBetween(0, PROOF_DATA.length - 1)];
+      const item = SOCIAL_PROOF_ROTATIONS[index % SOCIAL_PROOF_ROTATIONS.length];
+      index = (index + 1) % SOCIAL_PROOF_ROTATIONS.length;
       setToast(item);
       setVisible(true);
 
       hideTimeout = setTimeout(() => {
         setVisible(false);
-        showTimeout = setTimeout(showNext, randomBetween(8000, 15000));
-      }, 4000);
+        showTimeout = setTimeout(showNext, randomBetween(GAP_MIN_MS, GAP_MAX_MS));
+      }, VISIBLE_MS);
     }
 
-    showTimeout = setTimeout(showNext, randomBetween(10000, 20000));
+    // First toast: small initial delay after arming so it doesn't feel instant.
+    showTimeout = setTimeout(showNext, randomBetween(3000, 6000));
 
     return () => {
       clearTimeout(showTimeout);
       clearTimeout(hideTimeout);
     };
-  }, []);
+  }, [armed]);
 
   if (!toast) return null;
 
@@ -55,7 +80,9 @@ export default function SocialProofToast() {
       <div className="anyimmi-toast__content">
         <strong>{toast.name}</strong> from {toast.city}
         <br />
-        <span>just purchased the <strong>{toast.bundle}</strong> bundle</span>
+        <span>
+          just got <strong>{TIER_LABEL[toast.tier]}</strong> · {toast.ago}
+        </span>
       </div>
     </div>
   );
